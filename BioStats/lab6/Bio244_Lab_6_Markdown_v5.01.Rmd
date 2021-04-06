@@ -1,0 +1,71 @@
+---
+title: "Bio244 - LAB 6 - ANOVA"
+author: "Gabriel Perron"
+date: "2/13/2019"
+output: html_document
+---
+
+```{r loading necessary datasets and packages, echo=FALSE, results="hide"}
+#Before starting, I import my data
+TREE_S15 <- read.csv("~/Documents/BioStats/lab6/Tree_2015 - Sheet1.csv")
+#View(TREE_S15)
+TREE_F17 <- read.csv("~/Documents/BioStats/lab6/Tree_2017 - Sheet1.csv")
+#TREE <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/TREE.csv")
+library(ggplot2)
+
+```
+
+
+#Objective
+Using t-test to investigate whether the average tree height in the RKC parking lots differ in heights between the different rows and between different years.  
+
+##Question 1
+
+See board.
+
+
+##Question 2
+
+###Hypotheses
+H~0~: There is no effect of row on height in year 2015.  
+(or there is not difference in the average height of tree among row A, B, and C)  
+H~A~: There is an effect of row on height in year 2015. 
+(or there is a difference in the average height of tree among row A, B, and C).
+
+```{r Q2}
+model_1 <- aov(TREE_S15$Height ~ TREE_S15$Row)
+summary(model_1)
+
+```
+Conclusion: We reject H~0~; there is an effect of row on tree height (*F*~(2,15)~ = 4.516; *P* = 0.0292).
+
+##Question
+```{r}
+Fig1 <- ggplot(data=TREE_S15, aes(x=TREE_S15$Row, y=TREE_S15$Height)) + 
+        geom_boxplot()
+Fig1
+```
+  
+**Figure 1.** There is an effect of row on tree height (*F*~(2,15)~ = 4.516; *P* = 0.0292).
+
+##Question 4
+
+###Hypotheses
+H~0~: There is no effect of row on height in year 2017.
+H~A~: There is an effect of row on height in year 2017. 
+
+```{r Q2}
+model_2 <- aov(TREE_F17$Height ~ TREE_F17$Row)
+summary(model_2)
+
+```
+Conclusion: We fail to reject H~0~; there is no effect of row on tree height (*F*~(2,15)~ = 1.491; *P* = 0.257).
+
+
+```{r}
+Fig2 <- ggplot(data=TREE_F17, aes(x=TREE_F17$Row, y=TREE_F17$Height)) + 
+        geom_boxplot()
+Fig2
+```
+  
+  **Figure 2.** There is no effect of row on tree height (*F*~(2,15)~ = 1.491; *P* = 0.257).

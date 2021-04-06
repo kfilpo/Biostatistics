@@ -1,0 +1,78 @@
+---
+title: "Bio244 - LAB 15 - Multiple Regression"
+author: "Gabriel Perron"
+date: "2019/4/01"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r loading necessary datasets and packages, echo=FALSE, results="hide"}
+#Before starting, I import my data
+whale <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/whale.csv", header=TRUE)
+library(car)
+```
+
+Before we go aheaddd with this kind of analysis, I like to use the "attach" function so that I don't have to refer to the dataset each time I try/use a variable:  
+```{r}
+attach(whale)
+names(whale)
+```
+
+#Question 1
+```{r}
+model_whale_1 <- lm(LRGWHAL~YEAR*MONTH*DAY*CLOUD8AM*VIS8AM)
+summary.aov(model_whale_1)
+```
+CLOUD8AM and VIS8AM are significant.  
+  
+#Question 2
+```{r}
+model_whale_2 <- lm(LRGWHAL~YEAR+MONTH+DAY+CLOUD8AM+VIS8AM)
+summary.aov(model_whale_2)
+```
+Again, CLOUD8AM and VIS8AM are significant.  
+  
+
+#Question 3
+```{r}
+model_whale_3 <- lm(LRGWHAL~VIS8AM+CLOUD8AM+DAY+MONTH+YEAR)
+summary.aov(model_whale_3)
+```
+This time, only VIS8AM is significant!
+  
+  
+#Question 4
+Running the same models, this time using the "Anova" function with type II sums of squares. This type of sums of squares, basically assumes that each factor is always last.
+```{r}
+Anova(lm(LRGWHAL~YEAR+MONTH+DAY+CLOUD8AM+VIS8AM), type=2)
+```
+VIS8AM is sifgnificant.
+
+#Question 5
+```{r}
+Anova(lm(LRGWHAL~VIS8AM+CLOUD8AM+DAY+MONTH+YEAR),type=2)
+```
+Again, VIS8AM is significant. In fact, VIS8AM has the same F-value and P-value irregardless of its position in the mode.
+
+
+#Question6
+```{r}
+(box.whale <- ggplot(whale, aes(factor(YEAR),LRGWHAL))+
+                    geom_boxplot(outlier.size=1,lwd=0.5,fatten = 1.25)  +
+                    geom_point(aes(fill = YEAR), size = 3, shape = 21, position = position_jitterdodge()) +
+                    theme_classic() )
+```
+
+#Question 7
+No. Looking at the interaction plot above, it is clear the number of whales does not follow a linear trend over time (e.g., it is not increasing or decreasing). Year should be considered as a categorical variable rather.
+
+#Question 8
+```{r}
+Anova(lm(LRGWHAL~factor(YEAR)+MONTH+DAY+CLOUD8AM+VIS8AM), type=2)
+```
+VIS8AM is still significant,but this time, YEAR is also significant. This is due to the fact that we were testing YEAR as continuous previously.
+
+#Question 9
+Mr. Cheapbone should only sell tickets on days where visibility is good at 8am (and potentially run his operation only on "good" years).

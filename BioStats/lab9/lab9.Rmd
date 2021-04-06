@@ -1,0 +1,73 @@
+---
+title: "Lab 9 - Analysis of Variance"
+author: "Katherine Filpo"
+date: "3/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+RADISH <- read.csv("~/Documents/BioStats/lab9/RADISH.csv")
+#to look at colors: colors()
+```
+
+## Lab 9: Interactions
+
+### Question 1 - effects on shoot length
+
+H~0~: There is no effect of water treatment or soil on shoot length.  
+
+H~A~: There is an effect of water treament or soil on shoot length. 
+
+**was supposed to have 6 total hypothesis here and for question 2
+green~soil+water+soil:water
+```{r}
+model_1 <-aov(RADISH$GREEN ~ factor(RADISH$WATER)+factor(RADISH$SOIL) +factor(RADISH$SOIL:RADISH$WATER))
+summary(model_1)
+```
+
+```{r pressure, echo=FALSE}
+Fig1 <-ggplot(RADISH, aes(y = GREEN, x=factor(WATER, level = c('low', 'High')), fill = SOIL))+
+  geom_boxplot() + 
+  xlab("Water Treatment") + 
+  ylab("Shoot Length (cm)") +
+  theme_classic()
+
+Fig1
+#the level thing is putting the x axis in the correct order 
+```
+
+**Figure 1**.Water treatment and soil type has an effect on shoot length (F(1,60)=19.359; P < 0.0001), when taking into account the soil.
+(the interaction is most important first, and since it is sigficicant, the other hypothesis are discarded)
+
+**Conclusion** After accounting for the soil, there is an effect of water treament on shoot length, so we reject the H~0~ and say that the H~A~ is supported (*F*~(1,60)~=19.359; *P* < 0.0001). 
+
+### Question 2 - effects on root
+
+H~0~: There is no effect of water treatment on root length.
+
+H~A~: There is an effect of water treatment on root length.
+
+roots~soil+water+soil:water
+```{r}
+model_2 <-aov(RADISH$ROOTS ~ factor(RADISH$WATER)+factor(RADISH$SOIL) +factor(RADISH$SOIL:RADISH$WATER))
+summary(model_2)
+```
+
+```{r, echo=FALSE}
+Fig2 <- ggplot(RADISH, aes(y = ROOTS, x=factor(WATER, level = c('low', 'High')), fill = SOIL))+
+  geom_boxplot() + 
+  xlab("Water Treatment") + 
+  ylab("Root Length (cm)") +
+  theme_classic()
+Fig2
+```
+
+**Figure 2**. Water treatment does not have an effect on root length (F(1,60)=1.929; P = 0.1700), when taking into account the soil.
+
+**Conclusion** There is no sigficifant effect on the root length by the water treamentment when taking the soil into account, so we accept the H~0~. 
+
+### Question 3
+Taking into account all the statistical analysis performed, I would say that the best treatment for the maximum legnt of shoots and roots of the plant is the higher water treatment. Soil does play a slight role in this but can overall be considered to be a lesser effect than the water treatment. 
+

@@ -1,0 +1,97 @@
+---
+title: "Bio244 - LAB 11 - Testing Assumptions II"
+author: "Gabriel Perron"
+date: "2020.03.19"
+output:
+  html_document: default
+  pdf_document: default
+---
+This markdown is only to help you use the code and try to make sense of what you see in your analysis.
+
+
+
+# Question 3
+Now, let's check on the model assumptions to make sure that our above model is valid.  
+  
+First, let's look at the **normality of errors:**
+```{r}
+#get unstandardized predicted and residual values
+unstandardizedPredicted <- predict(model_brist)
+unstandardizedResiduals <- resid(model_brist)
+
+#get standardized values
+standardizedPredicted <- (unstandardizedPredicted - mean(unstandardizedPredicted)) / sd(unstandardizedPredicted)
+standardizedResiduals <- (unstandardizedResiduals - mean(unstandardizedResiduals)) / sd(unstandardizedResiduals)
+
+#create residuals histogram
+hist(standardizedResiduals, freq = FALSE)
+curve(dnorm, add = TRUE) #this line must be ran along with the above one
+```
+  
+In the above plot, we see that there is a large proportion of the data distributed in the middle of the distribution. This is not ideal, but could be robust if homogeneity of variance holds up.  
+
+Second, we will also at the **homogeneity of variance:**
+```{r}
+# Plot homogeneity and normality of error
+plot(model_brist, which=c(1,1))
+```
+  
+  In the above graph, we see that the variance is not equally distribured accross the data set at the red line is not straight and that the data point are not evenly distributed.
+  
+
+# Question 4
+
+**Normality of errors**
+```{r}
+#get unstandardized predicted and residual values
+unstandardizedPredicted <- predict(model_bristlog)
+unstandardizedResiduals <- resid(model_bristlog)
+
+#get standardized values
+standardizedPredicted <- (unstandardizedPredicted - mean(unstandardizedPredicted)) / sd(unstandardizedPredicted)
+standardizedResiduals <- (unstandardizedResiduals - mean(unstandardizedResiduals)) / sd(unstandardizedResiduals)
+
+#create residuals histogram
+hist(standardizedResiduals, freq = FALSE)
+curve(dnorm, add = TRUE)
+```
+Here, we see that the residuals (or error) are more evenly spread out and less centralized. This is an improvement on the non-transformed data.
+
+**homogeneity of variance**
+```{r}
+# Plot homogeneity and normality of error
+plot(model_bristlog, which=c(1,1))
+```
+In this case, the transformation is not much of an improvement, in fact, the variance seems to be even less equally distributed and still follow a pattern (e.g. red line not straight).
+
+# Question 5
+
+**normality of errors**
+```{r}
+#get unstandardized predicted and residual values
+unstandardizedPredicted <- predict(model_bristsqrt)
+unstandardizedResiduals <- resid(model_bristsqrt)
+
+#get standardized values
+standardizedPredicted <- (unstandardizedPredicted - mean(unstandardizedPredicted)) / sd(unstandardizedPredicted)
+standardizedResiduals <- (unstandardizedResiduals - mean(unstandardizedResiduals)) / sd(unstandardizedResiduals)
+
+#create residuals histogram
+hist(standardizedResiduals, freq = FALSE)
+curve(dnorm, add = TRUE)
+```
+The errors are more or less normally distributed. This transformation is an improvement on the non-normally distributed data, but not much better than the log transofrmation. Let's look at the variance.  
+
+**homogeneity of variance**
+```{r}
+# Plot homogeneity and normality of error
+plot(model_bristsqrt, which=c(1,1))
+```
+  Here, we wee that the homogeneity of variance is much improved as the red line is fairly straight in the middle and and that the points are evenly distributed around the middle line.
+  
+
+
+
+
+
+

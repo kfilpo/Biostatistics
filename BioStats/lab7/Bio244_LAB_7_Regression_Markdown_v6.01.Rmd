@@ -1,0 +1,113 @@
+---
+title: "Bio244 - LAB 7 - Regression"
+author: "Gabriel Perron"
+date: "2019/02/20"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r loading necessary datasets and packages, echo=FALSE, results="hide"}
+#Before starting, I import my data
+HUMAN <- read.csv("~/Documents/BioStats/lab7/human.csv")
+#human <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/human.csv")
+library(ggplot2)
+library(gridExtra)
+
+```
+
+
+# Question 1
+```{r Figure 1}
+Figure1A <- ggplot(HUMAN, aes(x=HUMAN$INDEX, y=HUMAN$HEIGHT),title="(A)") +
+            geom_point() +
+            xlab("Index lenght (cm)") +
+            ylab("Height (cm)") +
+            theme_classic() 
+Figure1B <- ggplot(HUMAN, aes(x=HUMAN$FORE, y=HUMAN$HEIGHT),title="(B)") +
+            geom_point() +
+            xlab("Forearm lenght (cm)") +
+            ylab("Height (cm)") +
+            theme_classic()
+
+grid.arrange(Figure1A, Figure1B, ncol=2)
+```
+  
+  **Figure 1.** The relationship between human heigth (cm) and **A)** index length (com); and **B)** forearm length (cm).
+
+
+# Question 2
+## Does index predict height
+H~0~: Height is not explained/predicted by index length;  
+H~A~: Height is  explained/predicted by index length;    
+```{r}
+model.index <- lm(HUMAN$HEIGHT~HUMAN$INDEX)
+anova(model.index)
+```
+**Conclusion**: We reject H~0~. Therefore, Height is predicted by index length; (*F*~(1,47)~ = 4.57; *P* = 0.038).  
+
+**Estimating regression parameters**
+```{r}
+summary(model.index)
+```
+  **Equation:** y = 157.36 + 1.69x; *R*^2^ = 0.069
+
+## Does forearm predict height
+H~0~: Height is not explained/predicted by forearm length;    
+H~A~: Height is  explained/predicted by forearm length;    
+```{r}
+model.fore <- lm(HUMAN$HEIGHT~HUMAN$FORE)
+anova(model.fore)
+```
+**Conclusion**: We reject H~0~. Therefore, Height is predicted by forearm length; (*F*~(1,47)~ = 19.81; *P* < 0.0001).  
+
+**Estimating regression parameters**
+```{r}
+summary(model.fore)
+```
+**Equation:** y = 141.8 + 1.11x; *R*^2^ = 0.28
+
+## Correting for multiplicity of p-value
+Here is a good example of a situation where one should apply a Bonferonni correction. If you think about it, it would be possible to try to predict human heigth from hundred of different bones, thus running the chance to find one that is significant by chance along. For this reason, we will apply the following correction:
+
+**Adjusted P-value for index**
+```{r}
+p.adjust(0.038, method = "bonferroni", n= 2)
+```
+**New Conclusion**: We fail to reject H~0~. Therefore, Height is not predicted by index length; (*F*~(1,47)~ = 4.57; adj-*P* = 0.08).  
+
+**Adjusted P-value for forearm**
+```{r}
+p.adjust(5.23e-05, method = "bonferroni", n= 2)
+```
+**New Conclusion**: We stillreject H~0~. Therefore, Height is  predicted by index length; (*F*~(1,47)~ = 19.81; adj-*P* = 0.0001).  
+
+# Question 3
+```{r Figure 2}
+Figure2A <- ggplot(HUMAN, aes(x=HUMAN$INDEX, y=HUMAN$HEIGHT),title="(A)") +
+            geom_point() +
+            geom_smooth(method='lm', se = FALSE) +
+            xlab("Index lenght (cm)") +
+            ylab("Height (cm)") +
+            theme_classic() 
+  Figure2B <- ggplot(HUMAN, aes(x=HUMAN$FORE, y=HUMAN$HEIGHT),title="(B)") +
+            geom_point() +
+            geom_smooth(method='lm', se = FALSE) +
+            xlab("Forearm lenght (cm)") +
+            ylab("Height (cm)") +
+            theme_classic()
+
+grid.arrange(Figure2A, Figure2B, ncol=2)
+```
+
+  **Figure 2.** Human height **A)** cannot be predicted by index lenght (*F*~(1,47)~ = 4.57; adj-*P* = 0.08; y = 157.36 + 1.69x; *R*^2^ = 0.069); and **B)** can be predicted by forearm (*F*~(1,47)~ = 19.81; adj-*P* = 0.0001;y = 141.8 + 1.11x; *R*^2^ = 0.28).
+
+
+## Question 4
+Based on the fact that only forearm was significant after correcting for multiple comparisons, I conclude that forearm is the best predictor. In addition, the *R*^2^ value is larger.
+
+
+
+
+
+

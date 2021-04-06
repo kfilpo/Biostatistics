@@ -1,0 +1,97 @@
+---
+title: "Bio244 - LAB 10 - Independence"
+author: "Gabriel Perron"
+date: "Updated on 2020/3/31"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r, echo=FALSE, results="hide",message=FALSE,warning=FALSE}
+#loading necessary libraries for running the script
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(dplyr)
+```
+
+# Question 1
+Dr. Sharp would  conclude that there is a significant difference in the lookup rate betwen make and female sheep.
+
+
+# Question 2 & 3
+Here, the individual data points are not independent from each other. Dr. Sharp took multiple (20) measurement from each sheep. In reality, there is only 6 sheep in the experiment, or 6 independent data point. I would suggest taking the average lookup rate for each individual sheep. To do so, I would either compute the average for each sheep and create a new csv file with the six datpoint. Or it is possible to use R to create a new table using the following code:
+
+
+
+```{r}
+sheep <- read_excel("sheep.xlsx")
+
+sheepavg <- sheep %>%  #Create a new dataframe named sheepavg
+  group_by(SHEEP) %>%  #Group the values by sheep
+  mutate(avgNLOOKUPS = mean(NLOOKUPS)) %>% #Create a new column for averages
+  distinct(avgNLOOKUPS,SHEEP,SEX) #Keep one value per sheep
+
+g=tableGrob(sheepavg,rows = NULL)
+grid.newpage()
+grid.draw(g)
+
+
+```
+ 
+ 
+ **Table 1.** Average lookup rate for each sheep
+
+*N.B. I do not expext you to be able to do so in a practical exam. But I want to show you the code in case you would like to learn how to use R for more functions.*
+
+
+# Question 4
+
+**a) Experimental Design:**
+```{r}
+Table2 = data.frame(Male=3,
+                   Female=3)
+g=tableGrob(Table2, rows = NULL)
+grid.newpage()
+grid.draw(g)
+```
+
+  **Table 2.** Experimental Diagram
+
+**b) Word equation:** AVGLOOKUPRATE ~ SEX
+
+**c) Hypotheses:**
+
+**H~0~**: There is no different in average loopup rate between male and female sheep.
+**H~A~**: There is a different in average loopup rate between male and female sheep.
+
+**d) Statisitcal Analysis:**
+```{r Figure 1}
+model_sheep <- lm(sheepavg$avgNLOOKUPS~factor(sheepavg$SEX))
+anova(model_sheep)
+```
+
+**e) Conclusion:** 
+We fail to reject H~0~. There is no different in average loopup rate between male and female sheep (*F*~(1,4)~ = 1.802; *P* = 0.25).
+
+
+**f) Data Vizualisation:**
+```{r}
+ggplot(sheepavg, aes(x=factor(SEX), y=avgNLOOKUPS)) +
+            geom_boxplot() +
+            xlab("Sheep sex") +
+            ylab("Average Lookup Rate") +
+            theme_classic() 
+```
+ 
+ **Figure 1.** There is no different in average loopup rate between male and female sheep (*F*~(1,4)~ = 1.802; *P* = 0.25).
+
+# Question 5
+I would suggest that Dr. Sharp re-allocate his time studying more sheep rather than studying the same sheep over and over.
+
+
+
+
+
+

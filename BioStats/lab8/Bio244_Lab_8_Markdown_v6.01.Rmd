@@ -1,0 +1,78 @@
+---
+title: "Bio244 - LAB 7 - Two-Way Anova"
+author: "Gabriel Perron"
+date: "2/13/2019"
+output: html_document
+---
+
+```{r loading necessary datasets and packages, echo=FALSE, results="hide"}
+#Before starting, I import my data
+SAPLINGS <- read.csv("~/Documents/BioStats/lab8/SAPLINGS.csv")
+#SAPLINGS <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/SAPLINGS.csv")
+#SAPLINGS_updated <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/SAPLINGS_updated.csv")
+library(ggplot2)
+```
+
+
+# Objective
+Learning how to use two-way anova to test for multiple explanatory variables, including blocking. 
+
+## Question 1
+H~0~: There is no effect of water treatment on sapling length;  
+H~A~: There is an effect of water treatment on sapling length.   
+```{r draw experimental diagram}
+model1 <- aov(SAPLINGS$FINALHT~factor(SAPLINGS$WATER_TREAT))
+summary(model1)
+```
+**Conclusion**: We fail to reject H~0~. There is no effect of water treatment on sapling length (*F*~(3,36)~=1.972; *P* = 0.136).
+
+## Question 2
+```{r bar graph Question 2}
+(Fig1 <- ggplot(data=SAPLINGS, aes(x=factor(WATER_TREAT), y=FINALHT)) +
+              geom_boxplot() +
+              theme_classic() +
+              xlab("Water treatment") +
+              ylab("Final height (cm)"))
+
+```
+    
+**Figure 1.** Water treatment has no effect on sapling lenght (F(3,36)=1.972; P = 0.136).  
+  
+
+## Question 3
+H~0~: There is no effect of water treatment on sapling growth;  
+H~A~: There is an effect of water treatment on sapling growth.    
+```{r question 5}
+model3 <- aov(SAPLINGS_updated$DHT~factor(SAPLINGS_updated$WATER_TREAT))
+summary(model3)
+```
+**Conclusion**: We reject H~0~. There is an effect of water treatment on sapling growth (*F*~(3,36)~ = 17.35; *P* < 0.0001).
+
+
+## Question 4
+H~01~: There is no effect of initial heigth on sapling length;  
+H~A1~: There is an effect of initial height on sapling length;   
+H~02~: There is no effect of water treatment on sapling length;  
+H~A3~: There is an effect of water treatment on sapling length. 
+```{r}
+model2 <- aov(SAPLINGS$FINALHT~SAPLINGS$INITHT+factor(SAPLINGS$WATER_TREAT))
+summary(model2)
+```
+**Conclusions:**  
+We reject H~01~: There is an effect of initial height on sapling length (*F*~(1,35)~=16637.38; *P* < 0.0001).  
+We reject H~02~: There is an effect of water treatment on sapling length (*F*~(3,35)~=64.74; *P* < 0.0001).  
+
+Or,  
+After accounting for the initial length of saplings (F(1,35) = 16637.38; P < 0.0001), we found that water treatment had a significant effect on sapling length (F(3,35) = 64.74; P < 0.0001).
+
+## Question 5
+```{r Figure 2}
+(Fig2 <- ggplot(data=SAPLINGS_updated, aes(x=factor(WATER_TREAT), y=DHT)) +
+              geom_boxplot() +
+              theme_classic() +
+              xlab("Water treatment") +
+              ylab("Growth (cm)"))
+```
+  
+**Figure 2.** The effect of water treatment on sapling growth. Water treatment has a significant effect on sapling lenght (*F*~(3,35)~=64.74; *P* < 0.0001), after accounting for the initial length of saplings (*F*~(1,3)~=16637.38; *P* < 0.0001). Four water treatments were tested and growth was measured in centimeters (cm). Boxplots' lines represent median and hinges indicate first and third quartiles. Individual points reprsent statistical outliers but were included in the analysis.
+

@@ -1,0 +1,60 @@
+---
+title: "lab10 - Independence - Katherine Filpo"
+author: "Katherine Filpo"
+date: "3/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(ggplot2)
+sheep <- read_excel("sheep.xlsx")
+sheepavg <- read_excel("sheepavg.xlsx")
+```
+
+### Question 1 
+
+The conclusion he is reaching from the analysis he has done is that his hypothesis is significant, the hypthesis being that male sheep look up more than female sheep. 
+
+### Question 2
+
+The flaw of the analysis is that the scientist analysized the data set as if the data points are independent from each other, but this is not true. The male sheep from different day to different day are kept track of as individual sheep but actually, they should be grouped together and analyzed like that. 
+
+### Question 3
+
+A way to solve the problem is to group the different days data points of each sheep together to the sheep that it is and then analyze the different sexes' with each other. 
+
+### Question 4
+
+**A)** The new experimental design would be that the sheep would be grouped together, and you would establish the average amount of times they look up and analyze that. In this way the sheep would be individualized but you could also look at the groupings of different sex. 
+
+**B)** LOOKUPS ~ SEX
+
+**C)**
+
+H~0~ The sex of the sheep has no effect on how many times the sheep look up. 
+
+H~A~ The sex the sheep has an effect on how many times the sheep look up. 
+
+**D)**
+```{r, echo=FALSE}
+model <- lm(sheepavg$avgNLOOKUPS~factor(sheepavg$SEX))
+anova(model)
+```
+
+**E)** We fail to reject H~0~ (*F*~(1,4) = 0.5427). 
+
+**F)**
+```{r, echo=FALSE}
+ggplot(sheepavg, aes(x=factor(SEX), y=avgNLOOKUPS)) +
+            geom_boxplot() +
+            xlab("Sex of Sheep") +
+            ylab("Average Lookup Rate") +
+            theme_classic() 
+```
+
+### Question 5 
+
+A better way to design investigating feeding behavior would be to use even more sheep than just the six. It is hard to establish somthing about the who species only using six sheep. 
+

@@ -1,0 +1,90 @@
+---
+title: "Lab4-T_Test-Katherine_Filpo"
+author: "Katherine Filpo"
+date: "2/7/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+TREE_S15 <- read.csv("~/Documents/BioStats/lab4/TREE_S15.csv")
+#View(TREE_S15)
+TREE_F17 <- read.csv("~/Documents/BioStats/lab4/TREE_F17.csv")
+#View(TREE_F17)
+```
+
+H~0~ My null hypothesis is that there is no differnce between the height of the trees. 
+
+H~A~ My actual hypothesis is that there is a difference in the height of the trees. 
+
+## Average tree height - 2015
+10 degrees of freedom, so therefore the critical t is -/+1.81 
+
+This is for dataset A and B
+The t = -2.5722 which falls OUT of the expected for the critical t for this test, so it is out of the norm. 
+```{r}
+t.test(TREE_S15$HA_S15, TREE_S15$HB_S15, var.equal = TRUE)
+```
+
+
+This is for A and C
+The t is -0.81415 which falls within the expected t. 
+```{r}
+t.test(TREE_S15$HA_S15, TREE_S15$HC_S15, var.equal = TRUE)
+```
+
+
+This is for B and C
+The t for this is 1.951 which falls OUT of the expected t.
+```{r}
+t.test(TREE_S15$HB_S15, TREE_S15$HC_S15, var.equal = TRUE)
+```
+
+## Average tree height- 2017
+Critical t is still -/+1.81 
+
+This is for row A and row B
+The t is -0.22714, which falls OUT of the expected t. 
+```{r}
+t.test(TREE_F17$HA_F17, TREE_F17$HB_F17, var.equal = TRUE)
+```
+
+This is for A and C
+The t is -1.2557, which falls within the expected t. 
+```{r}
+t.test(TREE_F17$HA_F17, TREE_F17$HC_F17, var.equal = TRUE)
+```
+
+This is for B and C
+The t is -1.2058, which falls within the expected t. 
+```{r}
+t.test(TREE_F17$HC_F17, TREE_F17$HB_F17, var.equal = TRUE)
+```
+
+## Paired T-test
+
+The degree of separation is 5, so the critical t is 2.02
+
+This is for 2015 to 2017, row A
+The t is -3.4076, which falls out of the expected t, 
+```{r}
+t.test(TREE_S15$HA_S15, TREE_F17$HA_F17, paired = TRUE, var.equal = TRUE)
+#why does it need the vr equal part
+```
+
+This is for '15 to '17, row B
+The t is 1.0261, which falls within the expected t. 
+```{r}
+t.test(TREE_S15$HB_S15, TREE_F17$HB_F17, paired = TRUE, var.equal = TRUE)
+```
+
+This is for '15 to '17, row C
+The t is -1.5564, which falls within the expected t. 
+```{r}
+t.test(TREE_S15$HC_S15, TREE_F17$HC_F17, paired = TRUE, var.equal = TRUE)
+```
+
+## Final conclusions
+For the trees of row B and C, the t value falls within the expected t, which means that for those trees the null hypothesis is accepted, but for row A, the t falls out of the expected t range, so we reject the null hypthesis and say that the hypothesis is supported. 
+

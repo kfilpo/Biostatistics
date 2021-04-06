@@ -1,0 +1,88 @@
+---
+title: "Bio244 - LAB 9 - Two-Way Anova & Interactions"
+author: "Gabriel Perron"
+date: "2/25/2019"
+output:
+  #pdf_document: default
+  html_document: default
+---
+
+```{r loading necessary datasets and packages, echo=FALSE, results="hide"}
+#Before starting, I import my data
+#RADISH <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/RADISH.csv")
+RADISH <- read.csv("~/Documents/BioStats/lab9/RADISH.csv")
+library(ggplot2)
+library(gridExtra)
+```
+
+
+# Objective
+Learning how to use two-way anova to test for multiple explanatory variables,
+
+## Question 1
+H~0i~: There is no effect of the interaction betwene soil type and water treatment on shoot length;  
+H~Ai~: There is an effect of the interaction betwene soil type and water treatment on shoot length;   
+H~01~: There is no effect of soil type on shoot length;  
+H~A1~: There is an effect of soil type on shoot length;  
+H~02~: There is no effect of water treatment on shoot length;  
+H~A~: There is an effect of water treatment on shoot length;  
+```{r Question 1}
+model1 <- lm(RADISH$GREEN~factor(RADISH$SOIL)+factor(RADISH$WATER)+factor(RADISH$SOIL):factor(RADISH$WATER))
+anova(model1)
+```
+**Conclusion**: There is a significant effect of the interaction betwene soil type and water treatment on shoot length (*F*~(1,60)~ = 19.359; *P* < 0.0001).  
+
+```{r Figure 1}
+(Figure1 <- ggplot(RADISH, aes(y=GREEN, x=factor(WATER), fill=SOIL)) +
+            geom_boxplot() +
+            xlab("Water Treatment") +
+            ylab("Shoot lenght (cm)")+
+            theme_classic())
+
+#Now let's order water treatment from low to high on the x-axis
+(Figure1_ordered <- ggplot(RADISH, aes(y=GREEN, x=factor(WATER, level = c('low','High')), fill=SOIL)) +
+            geom_boxplot() +
+            xlab("Water Treatment") +
+            ylab("Shoot lenght (cm)")+
+            theme_classic())
+
+```
+  
+**Figure 1.** There is a significant effect of the interaction betwene soil type and water treatment on shoot length (*F*~(1,60)~ = 19.359; *P* < 0.0001). 
+
+
+## Question 2
+H0~i~: There is no effect of the interaction betwene soil type and water treatment on root length;  
+H~A~: There is an effect of the interaction betwene soil type and water treatment on root length;   
+H~01~: There is no effect of soil type on root length;  
+H~A1~: There is an effect of soil type on root length;  
+H~02~: There is no effect of water treatment on root length;  
+H~A2~: There is an effect of water treatment on root length;  
+```{r Question 2}
+model1 <- aov(RADISH$ROOT~factor(RADISH$SOIL)+factor(RADISH$WATER)+factor(RADISH$SOIL):factor(RADISH$WATER))
+summary(model1)
+```
+**Conclusion**: There is no effect of the interaction betwene soil type and water treatment on shoot length (*F*~(1,60)~ = 1.929; *P* = 0.17). However, there is an effect of soil type (*F*~(1,60)~ = 11.859; *P* = 0.001) and water treatment (*F*~(1,60)~ = 31.82; *P* < 0.0001) on shoot length.
+
+
+```{r Figure 2}
+Figure2A <- ggplot(RADISH, aes(x=factor(WATER, level =c('low','High')), y=ROOTS)) +
+            geom_boxplot() +
+            xlab("Water Treatment") +
+            ylab("Root lenght (cm)")
+Figure2B <- ggplot(RADISH, aes(x=SOIL, y=ROOTS)) +
+            geom_boxplot() +
+            xlab("Soil Type") +
+            ylab("Root lenght (cm)")
+
+grid.arrange(Figure2A, Figure2B, ncol=2)
+
+```
+
+**Figure 2.** There is no significant effect of the interaction betwene soil type and water treatment on shoot length (*F*~(1,60)~ = 19.359; *P* < 0.0001). However, there is an effect of **A)** water treatment (*F*~(1,60)~ = 31.82; *P* < 0.0001) and **B)** soil type (*F*~(1,60)~ = 11.859; *P* = 0.001) on shoot length.
+
+## Question 3
+To maximize growht of leaves and roots system, I would recommend using an organic soil with a high water treatment.
+
+
+

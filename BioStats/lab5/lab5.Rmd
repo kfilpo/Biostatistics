@@ -1,0 +1,69 @@
+---
+title: "Lab5-P values and Simulation"
+author: "Katherine Filpo"
+date: "2/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q1 Random Selection of trees
+If someone went out and sampled 100 random trees in the woods behind RKC I would expect the t-test would be a value that is expected and that there is comparable to t test that you could have gotten if you looked at all the trees. I would not expect for the t value for all the trees to be some huge number. Yes, there would be more variation in the 100 trees within themselves (so visually it would make a flatter curve) but it would still fit with the data from all the other trees (this curve would have a much more centered distribution). 
+
+## Q2 Repetition of the experiment
+If someone were to repeat this random experiment 100 times, I would expect that the statistical conclusion would be similar to the first two. There might be variation in the t value for each group of trees and even some groups that land on opposite "ends" of the range that would be expected for the t value of the whole poplulation of all the trees but I would not expect for a single group to have a wild result, as in a t that is drastically different. 
+
+One could maybe get a significant value about 5 times out of 100 times (5% of the time).
+
+## Q3 Statistical Test
+H~0~There will be no significant value for a random amount of trees sampled. 
+
+H~A~There will be a random group of trees sampled that will have a significant p value, meaning that they will be different in some way than the average trees in the area. 
+
+```{r}
+x=1
+while(x<21)
+{
+  sample_1<-rnorm(100,15678,250)
+  sample_2<-rnorm(100,15678,250)
+  print(t.test(sample_1, sample_2, var.equal=TRUE))
+  x=x+1
+}
+```
+
+## Q4 
+I got a significant value 0 times. 
+
+## Q5 
+### Ten Trees
+I got a significant value 0 times. 
+```{r}
+x=1
+while(x<21)
+{
+  sample_1<-rnorm(10,15678,250)
+  sample_2<-rnorm(10,15678,250)
+  print(t.test(sample_1, sample_2, var.equal=TRUE))
+  x=x+1
+}
+```
+
+### A Thousand Trees
+I got a significant value in one instance.
+```{r}
+x=1
+while(x<21)
+{
+  sample_1<-rnorm(1000,15678,250)
+  sample_2<-rnorm(1000,15678,250)
+  print(t.test(sample_1, sample_2, var.equal=TRUE))
+  x=x+1
+}
+```
+
+
+## Result
+
+There were no significant values for a random sampling of trees meaning that we reject the H~A~ and accept the H~0~.

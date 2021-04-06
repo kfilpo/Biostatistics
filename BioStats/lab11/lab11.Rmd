@@ -1,0 +1,101 @@
+---
+title: "lab11 - Transforming Data"
+author: "Katherine Filpo"
+date: "4/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(readxl)
+bristles <- read_excel("bristles.xlsx")
+```
+
+### Question 1
+
+I expect that the data requires a transformation because the experiment will most likely cause a very drastic change in the flies, as mutations can be small or very large.
+
+### Question 2  - Untransformed data set
+
+H~0~ The different levels of radation will not have an effect on the brisltes of the flies.
+
+H~A~ The different levels of radation will have an effect on the bristles.
+
+```{r, echo = FALSE}
+model_1 <- aov(bristles$NBRIST~factor(bristles$GEN)+factor(bristles$BLOCK))
+summary(model_1)
+```
+
+**Conclusion**
+The H~A~ is supported (**F**(4,20)=36.24). 
+
+### Question 3
+The homogeneity of variance seems to be well distributed as the data set makes a normal distribution shape. 
+
+```{r}
+unstandarizedPred <- predict(model_1)
+unstandarizedRes <- resid(model_1)
+
+standarizedPred <- (unstandarizedPred - mean(unstandarizedPred)) / sd(unstandarizedPred)
+standarizedRes <- (unstandarizedRes - mean(unstandarizedRes)) / sd(unstandarizedRes)
+
+hist(standarizedRes, freq = FALSE)
+curve(dnorm, add = TRUE)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(model_1)
+```
+
+### Question 4  - Transformed data set: Square Root
+```{r, echo=FALSE}
+model_2 <- aov(bristles$NBRISTsqrt~factor(bristles$GEN)+factor(bristles$BLOCK))
+summary(model_2)
+```
+
+**Conclusion**
+The H~A~ is supported (**F**(4,20)=57.38). The distribution here also seem to be well as there is a normal distribution, and a flatter curve. 
+```{r}
+unstandarizedPred <- predict(model_2)
+unstandarizedRes <- resid(model_2)
+
+standarizedPred <- (unstandarizedPred - mean(unstandarizedPred)) / sd(unstandarizedPred)
+standarizedRes <- (unstandarizedRes - mean(unstandarizedRes)) / sd(unstandarizedRes)
+
+hist(standarizedRes, freq = FALSE)
+curve(dnorm, add = TRUE)
+```
+
+
+### Question 5  - Transformed data set: Natural Log
+```{r, echo=FALSE}
+model_3 <- aov(bristles$NBRISTln~factor(bristles$GEN)+factor(bristles$BLOCK))
+summary(model_3)
+```
+
+**Conclusion**
+The H~A~ is supported (**F**(4,20)=27.12). The distribution here also seem to be well as there is a normal distribution, and one can see the flattest curve out of all three in this analysis. 
+```{r}
+unstandarizedPred <- predict(model_3)
+unstandarizedRes <- resid(model_3)
+
+standarizedPred <- (unstandarizedPred - mean(unstandarizedPred)) / sd(unstandarizedPred)
+standarizedRes <- (unstandarizedRes - mean(unstandarizedRes)) / sd(unstandarizedRes)
+
+hist(standarizedRes, freq = FALSE)
+curve(dnorm, add = TRUE)
+```
+
+### Final Figure
+```{r}
+ggplot(bristles, aes(x=factor(GEN), y=bristles$NBRISTln)) +
+            geom_boxplot() +
+            xlab("UV Radation Level") +
+            ylab("Bristle per Fly") +
+            theme_classic()  
+```
+
+**Figure 1**: The **F**(4,20) is 27.12, so it is statistically significant. 
+

@@ -1,0 +1,70 @@
+---
+title: "Lab8-Block Treaments"
+author: "Katherine Filpo"
+date: "2/28/2020"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+SAPLINGS <- read.csv("~/Documents/BioStats/lab8/SAPLINGS.csv")
+#View(SAPLINGS)
+```
+
+## Question 1: Is length explained by water?
+
+H~0~ There is no relationship between water treatment and length of plant. 
+
+H~A~ The water treament will affect the length of plant, in the manor that the more water, the longer the plant. 
+
+```{r}
+model_1<-aov(SAPLINGS$FINALHT ~factor(SAPLINGS$WATER_TREAT))
+summary(model_1)
+```
+
+#### Plot of the water treament and sapling length
+
+```{r pressure, echo=FALSE}
+Fig1 <- ggplot(SAPLINGS, aes(x=factor(SAPLINGS$WATER_TREAT), y=SAPLINGS$FINALHT))     +geom_boxplot() + xlab("Water Treatment") + ylab("Final Length (cm)")
+
+Fig1
+```
+
+**Figure 1.** The water treatment for seems to have a weak effect on the final length of the plats but wothout taking into effect the initial length, it is not possible to conclude without a doubt that it is only due to the water treatment, so we cannot accept or reject the hypothesis. (*F*~(3,36)~ = 1.9721) (lower the f the higher the p)
+
+## Question 2: Testing the initial height
+
+H~0~ The initial height of the plant has no relationship on the final length of the plant. 
+
+H~A~ THe initial height of the plant has an effect on the final length of the plant. 
+
+```{r}
+model_2<-aov((SAPLINGS$FINALHT-SAPLINGS$INITHT)~factor(SAPLINGS$WATER_TREAT))
+summary(model_2)
+```
+## Question 3: Two way Anova
+
+H~0~ The initial height has no effect on the final height of the plants even when taking into account the wter treatment. 
+
+H~A~ The iniital height and the water treatment both have an effect on the final height of the plants. 
+
+Here the initial height is a block so it must be in the second half of the data when typed; its basically saying is final height explained by water treatment when taking into account the initial height? 
+```{r}
+model_3<-aov(SAPLINGS$FINALHT~ SAPLINGS$INITHT + factor(SAPLINGS$WATER_TREAT))
+summary(model_3)
+```
+
+#### Plot of the effect of water treament on height when taking into account the initial height (two way anova)
+
+```{r, echo=FALSE}
+Fig2 <- ggplot(model_3, aes(x=factor(SAPLINGS$WATER_TREAT), y=(SAPLINGS$FINALHT-SAPLINGS$INITHT)))     +geom_boxplot() + xlab("Water Treatment") + ylab("Final Length (cm)")
+
+Fig2
+```
+
+**Figure 2.** The water treatment and the initial length of the plant have an effect the final length of the plant (*F*~(3,36)~ = 16637.378).
+
+## Conclusion
+Taking into account the initial legnth and the water treament, there is an effect of the 
+water treatment so the H~A~ is supported. 

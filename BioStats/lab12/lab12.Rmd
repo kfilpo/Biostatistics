@@ -1,0 +1,152 @@
+---
+title: "Lab12"
+author: "Katherine Filpo"
+date: "4/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(dplyr)
+potatoes <- read_csv("potatoes.csv")
+#View(potatoes)
+```
+
+## Part 1
+
+### Question 1
+
+ROT~OXYGEN, TEMP, BAC, or the interactions between any of those.
+
+**Hypotheses**
+
+H~01~ There is no effect of the intereaction between oxygen, temperature and bacteria on the rate of rot of the potatoes. 
+
+H~02~ There is no effect of the interation between oxygen and the temperature. 
+
+H~03~ There is no effect of the interaction between oxygen and bacteria. 
+
+H~04~ There is no effect of the interaction between temperature and bacteria. 
+
+H~05~ There is no effect of the oxygen. 
+
+H~06~ There is no effect of the temperature. 
+
+H~07~ There is no effect of the bacteria. 
+
+```{r}
+model_1 <-lm(ROT~factor(BAC)*factor(TEMP)*factor(OXYGEN), data = potatoes)
+anova(model_1)
+```
+
+**Conclusion:** H~04~ must be rejected as the **P** = 0.0498. H~06~ must be rejected as the **P** < 0.0001. H~07~  must be rejected as the **P** < 0.0001. H~01,2,3,5~ are suppported. 
+
+### Question 2 
+
+The assumumptions of normality and the homogeneity of varience are respected in the analysis used to make model 1. 
+
+```{r, echo=FALSE}
+unstandarizedPred <- predict(model_1)
+unstandarizedRes <- resid(model_1)
+
+standarizedPred <- (unstandarizedPred - mean(unstandarizedPred)) / sd(unstandarizedPred)
+standarizedRes <- (unstandarizedRes - mean(unstandarizedRes)) / sd(unstandarizedRes)
+
+hist(standarizedRes, freq = FALSE)
+curve(dnorm, add = TRUE)
+
+```
+
+```{r, echo = FALSE}
+par(mfrow=c(2,2))
+plot(model_1)
+```
+
+
+### Question 3 - Improving the model
+
+```{r}
+model_2 <- lm(ROT~factor(BAC)+factor(TEMP)+factor(OXYGEN)+factor(BAC):factor(TEMP)+factor(BAC):factor(OXYGEN)+factor(TEMP):factor(OXYGEN), data = potatoes)
+anova(model_2)
+```
+
+```{r}
+model_3 <- lm(ROT~factor(BAC)+factor(TEMP)+factor(OXYGEN)+factor(BAC):factor(TEMP), data = potatoes)
+anova(model_3)
+```
+
+```{r}
+model_4 <- lm(ROT~factor(BAC)+factor(TEMP)+factor(OXYGEN), data = potatoes)
+anova(model_4)
+```
+
+### Question 4 - Which model is better? 
+
+```{r}
+anova(model_1, model_2)
+```
+
+```{r}
+anova(model_2, model_3)
+```
+
+```{r}
+anova(model_3, model_4)
+```
+
+The model that best explains the results of the data is model 4. This is because the RSS (the variability left unexplained) is smaller, therefore more is explained and it is the simplest model. 
+
+## Part 2
+
+### Question 5
+
+Testing BAC as a continuous variable would improve the model because it would show more sensitivity to the bacteria in the potatoes and let us better analyze the differences in oxygen and temperature treatments. 
+
+### Question 6 - Analysis with BAC as continuous variable
+
+```{r}
+model_5 <-lm(ROT~factor(TEMP):factor(OXYGEN)+BAC+factor(TEMP)+BAC+factor(OXYGEN), data = potatoes)
+anova(model_5)
+```
+
+```{r}
+model_6 <-lm(ROT~factor(TEMP)+BAC+factor(OXYGEN), data = potatoes)
+anova(model_6)
+```
+
+### Question 7 and 8
+
+```{r}
+anova(model_5, model_6)
+```
+
+The simplest model for this analysis would be model 5. I would pick model 5 as it is the simplest model but looks at all possible interactions clearly. Model 6, while being even simpler than model 5, seems to be missing interations that are important to look at, even thought they are not statistically significant.  
+
+### Question 9 
+
+error I kept getting: "non-numeric argument to binary operator" 
+I don't understand why as the data is all numbers 
+```{r, echo=FALSE}
+#Fig1<-ggplot(potatoes, aes(x=BAC, y=ROT, group=TEMP)+
+        #theme_classic()+
+        #xlab("Bacteria")+ylab("Rotton Potatoes"))
+#Fig1
+```
+
+### Question 10
+
+I would tell the farming board to make sure that their potatoes has the least amount of bacteria possible and pay atttention to the temperature for the best possible storage **P** < 0.000001. 
+
+### Question 11
+
+I think that the doing this will further reduce spoilage as **P**<0.00001. 
+
+```{r}
+temp2 <- filter(potatoes, TEMP =='2')
+model_7 <-lm(temp2$ROT~temp2$TEMP:factor(temp2$OXYGEN)+temp2$BAC+temp2$TEMP+temp2$BAC+factor(temp2$OXYGEN))
+anova(model_7)
+```
+
+

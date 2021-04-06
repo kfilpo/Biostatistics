@@ -1,0 +1,84 @@
+---
+title: "Practical"
+author: "Katherine Filpo"
+date: "4/6/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+SUNFLOWER <- read_csv("SUNFLOWER.csv")
+#View(SUNFLOWER)
+```
+
+***Word Equation***
+
+Biomass ~ light + water treatment
+
+***Hypotheses***
+
+H~01~ The water treatment will have no effect on the biomass of the sunflowers.  
+
+H~A1~ The water treatment will have an effect on the biomass of the sunflowers.
+
+H~02~ The amount of sunlight will have no effect on the biomass of the sunflowers. 
+
+H~A2~ The amount of sunlight will have an effect on the biomass of the sunflowers.
+
+H~03~ The light and water treatment will not have an effect on the biomass of the sunflowers. 
+
+H~A3~ The light and water treatment will not have an effect on the biomass of the sunflowers. 
+
+### Analysis of Water Treatment
+
+```{r}
+model_1 <-aov(SUNFLOWER$BIOMASS ~ SUNFLOWER$WATER)
+summary(model_1)
+```
+
+### Analysis of Light Treatment
+
+```{r}
+model_2 <-aov(SUNFLOWER$BIOMASS ~ SUNFLOWER$DENSITY)
+summary(model_2)
+```
+
+### Analysis of Both Water and Light Treatment
+
+```{r}
+model_3 <-aov(SUNFLOWER$BIOMASS ~ (SUNFLOWER$DENSITY+SUNFLOWER$WATER))
+summary(model_3)
+```
+
+## Figures
+
+```{r, echo=FALSE}
+Fig1 <- ggplot(SUNFLOWER, aes(x=factor(SUNFLOWER$WATER), y=SUNFLOWER$BIOMASS)) +
+  geom_boxplot() + 
+  theme_classic() +
+  xlab("Water Treatment") + 
+  ylab("Biomass of Plant")
+
+Fig1
+```
+
+***Figure 1.*** The biomass of plants are higher when the water treatment is similarly greater, supporting the H~A1~, **F**(1,25)= 21.56.
+
+```{r, echo=FALSE}
+Fig2 <- ggplot(SUNFLOWER, aes(x=factor(SUNFLOWER$DENSITY), y=SUNFLOWER$BIOMASS)) +
+  geom_boxplot() + 
+  theme_classic() +
+  xlab("Density of Plants") + 
+  ylab("Biomass of Plant")
+
+Fig2
+```
+
+***Figure 2.*** The biomass of the plants are higher when the density of the plants is lower but the relationship seems to be weak and the H~02~ must be accepted, **F**(1,25)= 4.052. 
+
+
+## Conclusion
+The best way to get the most biomass of the sunflower seeds is to have a higher water treatment and have less density of plants **F**(1,24)= 8.423. 
+

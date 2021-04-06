@@ -1,0 +1,258 @@
+---
+title: "Bio244 - LAB 12 & 13 - Model Selection"
+author: "Gabriel Perron"
+date: "2019/4/01"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r loading necessary datasets and packages, echo=FALSE, results="hide"}
+#Before starting, I import my data
+potatoes <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/potatoes.csv")
+library(ggplot2)
+library(dplyr)
+```
+
+# Question 1
+Given you level of expertise at this point, I would say it is okay to only write down the null hypotheses when you have several pairs of hypotheses to write. I think by now, we all know that the alternative is simply the opposite.
+
+**Hypotheses:**  
+**H~01~**: There is no effect of the interaction between BAC, TEMP & OXYGEN on Rotting.  
+**H~02~**: There is no effect of the interaction between BAC & TEMP on Rotting.  
+**H~03~**: There is no effect of the interaction between BAC & OXYGEN on Rotting.  
+**H~04~**: There is no effect of the interaction between OXYGEN & TEMP on Rotting.  
+**H~05~**: There is no effect of BAC on Rotting.  
+**H~06~**: There is no effect of TEMP on Rotting.  
+**H~07~**: There is no effect of OXYGEN on Rotting.  
+  
+**Statistical analysis**
+Here, I use the "*" as a shortcut to test the full statistical model. The stars basically include all the terms and all their interactions.
+```{r}
+model_1 <- lm(ROT~factor(BAC)*factor(TEMP)*factor(OXYGEN), data=potatoes)
+anova(model_1)
+
+#Alternatively you could write:
+#model_1<- lm(ROT~factor(BAC)+factor(TEMP)+factor(OXYGEN)+factor(BAC):factor(TEMP)+factor(BAC):factor(OXYGEN)+factor(TEMP):factor(OXYGEN)+factor(BAC):factor(TEMP):factor(OXYGEN))
+```
+  
+**Conclusions:**   
+**H~01~**: We fail to reject. There is no effect of the interaction between BAC, TEMP & OXYGEN on Rotting (*F*~(4,36)~ = 0.869; *P* = 0.49).  
+**H~02~**: We reject. There is an effect of the interaction between BAC and TEMP on Rotting (*F*~(2,36)~ = 3.27; *P* = 0.0498).  
+**H~03~**: We fail to reject. There is no effect of the interaction between BAC & OXYGEN on Rotting (*F*~(4,36)~ = 0.321; *P* = 0.862).  
+**H~04~**: We fail to reject.There is no effect of the interaction between OXYGEN & TEMP on Rotting (*F*~(2,36)~ = 0.34; *P* = 0.967).  
+**H~05~**: We reject. There is an effect of BAC on Rotting (*F*~(2,36)~ = 13.912; *P* < 0.0001).  
+**H~06~**: We reject. There is an effect of TEMP on Rotting (*F*~(2,36)~ = 36.202; *P* < 0.0001).  
+**H~07~**: We fail to reject. There is no effect of OXYGEN on Rotting (*F*~(2,36)~ = 2.088; *P* = 0.14).  
+  
+**Data Visualization**
+Here, because we only have a single significant interaction, it makes sense to plot the effect of BAC and TEMP. I decided to put BAC on the x-axis for reasons that should become obious in PART II. If you put TEMP on the x-axis for now, it is also good.
+```{r}
+ggplot(potatoes, aes(x=factor(BAC),y=ROT,fill=factor(TEMP))) +
+            geom_boxplot() +
+            xlab("Level of Bacteria") +
+            ylab("Rotting")+
+            theme_classic()
+
+```
+  
+  **Figure 1.** There is an effect of the interaction between BAC and TEMP on Rotting (F~(2,36)~ = 3.27; *P* = 0.0498).
+  
+# Question 2
+
+**normality of errors**
+```{r}
+#get unstandardized predicted and residual values
+unstandardizedPredicted <- predict(model_1)
+unstandardizedResiduals <- resid(model_1)
+
+#get standardized values
+standardizedPredicted <- (unstandardizedPredicted - mean(unstandardizedPredicted)) / sd(unstandardizedPredicted)
+standardizedResiduals <- (unstandardizedResiduals - mean(unstandardizedResiduals)) / sd(unstandardizedResiduals)
+
+#create residuals histogram
+hist(standardizedResiduals, freq = FALSE)
+curve(dnorm, add = TRUE) #run the following line at the same time as the one above.
+```
+The errors are pretty well distributed. Not biases on one side or the other. Let's look at the homogeneity of variance before making a final call.
+
+**Homogeneity of errors**
+```{r}
+plot(model_1, which=c(1,1))
+```
+The residuals are evenly distributed around the center and do not follow any trend (e.g. redl ine is straight). Given the nice spread of the homogeneity of variance, I am happy with the normality of errors as well. Let's move on!
+
+# Question 3 & Question 4
+
+We first simplify the model by removing the three-way interaction. Remember, we can only remover terms from one level of complexity at the time.
+```{r}
+model_2 <- lm(ROT~factor(BAC)+factor(TEMP)+factor(OXYGEN)+factor(BAC):factor(TEMP)+factor(BAC):factor(OXYGEN)+factor(TEMP):factor(OXYGEN), data=potatoes)
+anova(model_2)
+```
+Here, I will stop stating the conclusions. The truth is that when one is busy working on model simplification, it is easier to simply modify as much as possible until you choose a model to state you final conclusions. The idea is that you don't want to loose your train of thougt while making the different decisions.
+
+Now,  let's compare the two models to each other using the anova() function as shown in the lecture, testing the following two hypotheses:
+**H~0~**: There is not difference in the variability explained between the two models.  
+**H~A~**: There is a difference in the variability explained between the two models.  
+```{r}
+anova(model_1,model_2)
+```
+We reject **H~0~**: The The RSS is not different between model_1 and model_2, therefore we pick model_2 - the simpler one.  
+  
+We will then further simplify the model by removing the two-way interactions that are not significant:
+```{r}
+model_3 <- lm(ROT~factor(BAC)+factor(TEMP)+factor(OXYGEN)+factor(BAC):factor(TEMP), data=potatoes)
+anova(model_3)
+```
+  
+Once again, we will compare the two models for model fit:  
+**H~0~**: There is not difference in the variability explained between the two models.  
+**H~A~**: There is a difference in the variability explained between the two models.  
+```{r}
+anova(model_2, model_3)
+```
+We reject **H~0~**: The The RSS is not different between model_2 and model_3, therefore we pick model_3 - the simpler one.  
+  
+We further simplify the model by remocing OXYGEN from the model altogether:
+```{r}
+model_4 <- lm(ROT~factor(BAC)*factor(TEMP), data=potatoes)
+anova(model_4)
+```
+  
+We then compare the models for model fit:  
+**H~0~**: There is not difference in the variability explained between the two models.  
+**H~A~**: There is a difference in the variability explained between the two models.  
+```{r}
+anova(model_3, model_4)
+```
+We reject **H~0~**: The RSS is not different between model_3 and model_4, therefore we pick model_4 - the simpler one.
+
+
+Finally, since the two-way interaction is not "super" significant, we might be tempted to remove it as well. Let's give it a try:
+```{r}
+model_x <- lm(ROT~factor(BAC)+factor(TEMP), data=potatoes)
+anova(model_x)
+```
+Of course, BAC and TEMP are still very significant, but let's see if removing the significant interaction improved on the model:
+**H~0~**: There is not difference in the variability explained between the two models.  
+**H~A~**: There is a difference in the variability explained between the two models.  
+```{r}
+anova(model_4,model_x)
+```
+Ha ha! here we see that we reject H~0~; there is a difference in the variability explaiend between the two models. Because Model 1 (or model 4) has a lower RSS, this means that it explains significantly more variability and we should keep it.
+
+              
+# Question 5
+Considering BAC as continuous could be a good idea because BAC seems to follow a linear trend
+when looking at Figure 1.
+              
+
+# Question 6
+We will start by removing the three-way interactions:
+```{r}
+model_5 <- lm(ROT~BAC*factor(TEMP)*factor(OXYGEN), data=potatoes)
+anova(model_5)
+```
+
+
+
+# Question 7 & 8
+```{r}
+model_6 <- lm(ROT~BAC+factor(TEMP)+factor(OXYGEN)+BAC:factor(TEMP)+BAC:factor(OXYGEN)+factor(TEMP):factor(OXYGEN), data=potatoes)
+anova(model_6)
+```
+
+Once again, we will compare the two models for model fit: 
+```{r}
+anova(model_5,model_6)  
+```
+The RSS is not different between model_5 and model_6, therefore we pick model_6 - the simpler one.
+  
+We then removed the two-way intereactions that are not significant:
+```{r}
+model_7 <- lm(ROT~BAC+factor(TEMP)+factor(OXYGEN)+BAC:factor(TEMP), data=potatoes)
+anova(model_7)
+```
+
+    
+Once again, we will compare the two models for model fit: 
+```{r}
+anova(model_6,model_7)
+```
+The RSS is not different between model_6 and model_7, therefore we pick model_7 - the simpler one.
+  
+We remove Oxygen from the model altogher:
+```{r}
+model_8 <- lm(ROT~BAC+factor(TEMP)+BAC:factor(TEMP), data=potatoes)
+anova(model_8)
+```
+
+  
+Once again, we will compare the two models for model fit: 
+```{r}
+anova(model_7,model_8) 
+```
+The RSS is not different between model_7 and model_8, therefore we pick model_8 - the simpler one.
+  
+Finally, let's check whether it is best to consider BAC as continuous or categorical:
+```{r}
+anova(model_4,model_8)
+```
+The RSS is not different between model_4 and model_8. We pick model_8 which has more DF in residual. It is thus a good idea to consider BAC as continuous in this model.
+
+              
+# Question 9
+```{r}
+ggplot(potatoes, aes(x=BAC, y=ROT,colour=factor(TEMP), group=TEMP)) +
+  geom_point()+
+  geom_smooth(method=lm,se=FALSE)+
+  theme_classic()+
+  xlab("Bacteria Level")+ylab("Number of rotten potatoes")+
+  xlim("Low", "Medium", "High") +
+  theme_classic() +
+  theme(axis.line.x = element_line(color = "black"), axis.line.y = element_line(color = "black"))
+```
+              
+**Figure 2**. The effect of bacterial load on potatoes spoilage at different temperature. We found that the initial bacterial load significant predicted spoilage of different temperature (*F*~(1,50)~ = 6.98; *P* < 0.01). 
+
+
+# Question 10
+I would recommend to store potatoes in a cold room and to minimize the amount of bacteria present on the potatoes at the time of storage.
+
+# Question 11
+
+Becfore you can use filter(), you have to install the dyplr package (see in the first chunk of this markdown).
+```{r}
+temp2 <- filter(potatoes, TEMP =="2")
+temp2_lm <- lm(data=temp2, ROT~BAC)
+anova(temp2_lm)
+```
+
+  
+```{r}
+summary(temp2_lm)
+```
+**Equation:** Y = 6.23X + 0.81; X^2^ = 0.50
+
+
+```{r}
+ggplot(temp2, aes(x=BAC, y=ROT)) +
+  geom_point()+
+  geom_smooth(method=lm,se=FALSE)+
+  theme_classic()+
+  xlab("Bacteria Level")+ylab("Number of rotten potatoes")+
+  xlim("Low", "Medium", "High") +
+  theme_classic() +
+  theme(axis.line.x = element_line(color = "black"), axis.line.y = element_line(color = "black"))
+```
+  
+**Figure 3.** The effect of bacterial load on potatoes spoilage at temperature 2 (*F*~(1,25)~ = 26.67; *P* < 0.0001). The regression line is explained by Y = 6.23X + 0.81; X^2^ = 0.50.
+
+
+
+Our model indeed predicts that spoilage would further diminish as the initial bacterial load decreases. I would suggest taking great care of reducing the initial bacterial load on the potatoes. Maybe washing the legumes before storing.
+
+
+
+

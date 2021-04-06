@@ -1,0 +1,44 @@
+---
+title: "Lab 2 - Descriptive Statistics - Katherine"
+author: "Katherine Filpo"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Q1 Import Dataset 
+
+```{r cars}
+HERRING <- read.csv("~/Documents/BioStats/HERRING.csv") 
+# View(HERRING) is automatically done 
+```
+
+## Q2 Finding the mean, median, sd with formula
+
+```{r}
+mean(HERRING$LENGTH)
+```
+
+```{r}
+median(HERRING$LENGTH)
+```
+
+```{r}
+sd(HERRING$LENGTH)
+```
+
+```{r}
+mean(HERRING$DEPTH)
+median(HERRING$DEPTH)
+sd(HERRING$DEPTH)
+```
+## Q3 Plotting a scatter plot for the HERRING data
+
+```{r pressure, echo=FALSE}
+ggplot(data = HERRING) +geom_point(mapping = aes(x=LENGTH, y=DEPTH))
+#or ggplot(HERRING, aes(x = HERRING$length, y = HERRING$depth)) + geom_point()
+```
+

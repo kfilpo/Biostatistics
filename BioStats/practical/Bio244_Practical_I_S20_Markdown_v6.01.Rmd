@@ -1,0 +1,63 @@
+---
+title: "Bio244 - Practical I"
+author: "Gabriel Perron"
+date: "2020/4/01"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r, echo=FALSE, results="hide",message=FALSE,warning=FALSE}
+#loading necessary libraries for running the script
+library(ggplot2)
+SUNFLOWER <- read.csv("~/Dropbox/1_University/2_Education/1_Teaching/1_Bard/1_Courses/2_Biostats/0_Data_set/SUNFLOWER.csv")
+```
+
+**a) Word Equation:** BIOMASS ~ FARM + WATER + DENSITY + WATER:DENSITY
+
+**b) Hypothesis:**
+
+*Interaction*  
+**H~0i~*: There is no effect of the interaction between WATER and DENSITY on BIOMASS;  
+**H~Ai~*: There is an effect of the interaction between WATER and DENSITY on BIOMASS;  
+  
+*Density*  
+**H~0density~*: There is no effect of DENSITY on BIOMASS;  
+**H~Adensity~*: There is an effect of DENSITY on BIOMASS;  
+
+*Water*  
+**H~0water~*: There is no effect of WATER on BIOMASS;  
+**H~Awater~*: There is an effect of WATER on BIOMASS;  
+
+*Farm*  
+**H~0farm~*: There is no effect of FARM on BIOMASS;  
+**H~Afarm~*: There is an effect of FARM on BIOMASS;  
+
+**c) Statistical Analysis**  
+```{r}
+model_seeds <- lm(SUNFLOWER$BIOMASS~factor(SUNFLOWER$FARM)+factor(SUNFLOWER$WATER)+factor(SUNFLOWER$DENSITY)+factor(SUNFLOWER$WATER):factor(SUNFLOWER$DENSITY))
+anova(model_seeds)
+```
+
+**d) Conclusion:**   
+We reject H~0i~. There is an effect of the interaction between WATER and DENSITY on BIOMASS (*F*~(4,16)~ = 5.77; *P* = 0.005).  
+We rejext H~0farm~. There is no effect of FARM on BIOMASS (*F*~(2,16)~ = 3.88; *P* = 0.04).
+
+
+**e) Data Vizualisation:**  
+```{r}
+(Figure1 <- ggplot(SUNFLOWER, aes(y=BIOMASS, x=factor(DENSITY), fill=factor(WATER))) +
+            geom_boxplot() +
+            xlab("Density treatment") +
+            ylab("Biomass (g)")+
+            theme_classic())
+```
+ 
+ **Figure 1.** After accounting for the effect of farm on sunflower seeds biomass (*F*~(2,16)~ = 3.88; *P* = 0.04), we found a significant effect of the interaction between WATER and DENSITY on BIOMASS (*F*~(4,16)~ = 5.77; *P* = 0.005).
+
+
+
+
+
+

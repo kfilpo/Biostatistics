@@ -1,0 +1,50 @@
+---
+title: "Lab7_Variance_Analysis"
+author: "Katherine Filpo"
+date: "2/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+HUMAN <- read.csv("~/Documents/BioStats/lab7/human.csv")
+View(HUMAN)
+library(ggplot2)
+```
+H~0~ The index finger length and the height of a person is completely unrelated. 
+
+H~A~ Based on the scatter plots, the longer the index finger, the taller the height of the person, therefore, the index finger is the best predictor of the height. 
+
+## Q1 PLot of Forearm and Index fingers
+
+```{r pressure, echo=FALSE}
+ggplot(data = HUMAN) +geom_point(mapping = aes(x=FORE, y=HEIGHT, color = 'red'))
+```
+
+```{r, echo=FALSE}
+ggplot(data = HUMAN) +geom_point(mapping = aes(x=INDEX, y=HEIGHT)) 
+##+ guide = guide_legend figure out how to add this
+```
+
+## Anova for Forearm predicting 
+```{r}
+model_1<-lm(HUMAN$HEIGHT ~ HUMAN$FORE)
+anova(model_1)
+summary(model_1)
+```
+```{r}
+ggplot(HUMAN, aes(x = HEIGHT, y = FORE)) +geom_point() + geom_smooth(method=lm)
+```
+
+```{r}
+model_2<-lm(HUMAN$HEIGHT ~ HUMAN$INDEX)
+anova(model_2)
+summary(model_2)
+```
+
+```{r}
+ggplot(HUMAN, aes(x = HEIGHT, y = INDEX)) +geom_point() + geom_smooth(method=lm)
+```
+
+##Final Conclusions
+From the anovas, it is most clear that the forearm length is a better measurement to be used in predicting height of humans, so we accept the null hypothesis. 

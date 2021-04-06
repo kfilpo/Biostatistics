@@ -1,0 +1,95 @@
+---
+title: "Practical II"
+author: "Katherine Filpo"
+date: "5/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+apple <- read_csv("apple.csv")
+#View(apple)
+```
+
+### Word Equation
+
+Apple Rust ~ Wrapping + Temperature +Wrapping:Temperature
+ OR
+Virus ~ Wrapped + Temp + Wrapped:Temp
+
+### Hypothesis 
+
+*H~01~:* The interaction between wrapping and temeperature of the apple will not affect the apple rust. 
+
+*H~02~:* The temperature of the apple will not affect apple rust.
+
+*H~03~:* The wrapping of the apple will not affect apple rust.
+
+### Full Analysis
+
+Temp is catergorical variable:
+```{r}
+model_1 <-lm(VIRUS~TEMP+WRAPPED+WRAPPED:factor(TEMP),data=apple)
+anova(model_1)
+```
+
+Temp is a continuous variable:
+```{r}
+model_2<- lm(VIRUS ~ factor(WRAPPED) * TEMP, data = apple)
+anova(model_2)
+```
+
+No interaction betwen temp and wrapping:
+```{r}
+model_3<- lm(VIRUS ~ factor(WRAPPED) + factor(TEMP), data = apple)
+anova(model_3)
+```
+
+
+***Model Opimizing***
+```{r}
+anova(model_1, model_2)
+```
+
+```{r}
+anova(model_1, model_3)
+```
+
+**Model 1** is the better model because the Residual Sum of Squares is smaller. 
+
+***Testing Residuals and Homogeneity of Variance***
+```{r}
+unstandardizedPredicted <- predict(model_1)
+unstandardizedResiduals <- resid(model_1)
+
+standardizedPredicted <- (unstandardizedPredicted - mean(unstandardizedPredicted)) / sd(unstandardizedPredicted)
+standardizedResiduals <- (unstandardizedResiduals - mean(unstandardizedResiduals)) / sd(unstandardizedResiduals)
+
+hist(standardizedResiduals, freq = FALSE)
+curve(dnorm, add = TRUE) 
+```
+
+```{r}
+plot(model_1, which =c(1,1))
+```
+
+The assumptions of Model_1 are sound. The standardized residuals and homogenitity of variance are as expected. 
+
+
+### Conclusions + Graphs
+
+```{r}
+Fig1<-ggplot(apple, aes(x=TEMP, y=VIRUS,colour=WRAPPED, group=WRAPPED)) +
+  geom_boxplot()+
+  theme_classic()+
+  xlab("Temperature")+ylab("Rot") +
+  theme_classic() 
+Fig1
+```
+ 
+ **Figure 1.** Apple Rot by Temperature and Wrapping. The affect of temperature on apple rot is significant (**P** = 0.039).*H~01~:* must be rejected, meaning that the temperature and wrapping of the apple is significant in terms of how much rust the apple will have. 
+
+I would recommend that the Apple Orchardist American Association store their apples at a cooler temperature. Whether they are wrapped or not does not have a significant effect on the apple rot levels. 
+
